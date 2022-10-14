@@ -1,127 +1,46 @@
 #include <iostream>
 #include <vector>
+#include <limits>
 
 using namespace std;
 
+// helper functions
 void intro_text();
-void display_gameboard(vector<char> boardish);
+void reset_board();
+void display_gameboard();
+void validate_choice();
+void evaluate_tie();
+void evaluate_win();
+void reset_game();
 
+// params
+vector<char> board;
+int turn = 0;
+char player;
+bool tie = 0;
+bool win = 0;
+char champ;
+int x_wins = 0;
+int o_wins = 0;
+char continue_choice = 'y';
+int move_choice;
+
+// main
 int main() {
 	intro_text();
-	vector<char> board;
-	for (int i = 1; i <= 9; i++) {
-		board.push_back('-');
-	}
-	display_gameboard(board);
-	char one = '-', two = '-', three = '-', four = '-', five = '-', six = '-', seven = '-', eight = '-', nine = '-';
-	int turn = 0;
-	bool win = 0;
-	while (true) {
-		int move_choice;
-		if (turn % 2 == 0) {
-			cout << "X, it is your turn! Choose a place (1-9): ";
-			cin >> move_choice;
-			if (move_choice > 10 || move_choice <= 0) {
-				cout << "Please choose a section on the board!\n";
-				continue;
-			}
-			switch (move_choice) {
-			case 1:
-				board[0] = 'X';
-				break;
-			case 2:
-				board[1] = 'X';
-				break;
-			case 3:
-				board[2] = 'X';
-				break;
-			case 4:
-				board[3] = 'X';
-				break;
-			case 5:
-				board[4] = 'X';
-				break;
-			case 6:
-				board[5] = 'X';
-				break;
-			case 7:
-				board[6] = 'X';
-				break;
-			case 8:
-				board[7] = 'X';
-				break;
-			case 9:
-				board[8] = 'X';
-				break;
-			default:
-				cout << "Please choose a section of the board!";
-				break;
-			}
-			cout << "\n";
-			display_gameboard(board);
-			turn += 1;
-			if ((one == 'X' && two == 'X' && three == 'X') || (four == 'X' && five == 'X' && six == 'X') || (seven == 'X' && eight == 'X' && nine == 'X') ||
-				(one == 'X' && four == 'X' && seven == 'X') || (two == 'X' && five == 'X' && eight == 'X') || (three == 'X' && six == 'X' && nine == 'X') ||
-				(one == 'X' && five == 'X' && nine == 'X') || (three == 'X' && five == 'X' && seven == 'X')) {
-				win = 1;
-			}
-			if (!win) {
-				continue;
-			}
-			else {
-				break;
-			}
+	while (tolower(continue_choice) == 'y') {
+		reset_board();
+		display_gameboard();
+		while (!win && !tie) {
+			player = (turn % 2 == 0) ? 'X' : 'O'; // determine player turn
+			validate_choice();
+			board[move_choice - 1] = player; // mark move on board
+			display_gameboard();
+			evaluate_tie();
+			evaluate_win();
+			turn++; // switch turns
 		}
-		else if (turn % 2 == 1) {
-			cout << "O, it is your turn! Choose a place (1-9): ";
-			cin >> move_choice;
-			switch (move_choice) {
-			case 1:
-				board[0] = 'O';
-				break;
-			case 2:
-				board[1] = 'O';
-				break;
-			case 3:
-				board[2] = 'O';
-				break;
-			case 4:
-				board[3] = 'O';
-				break;
-			case 5:
-				board[4] = 'O';
-				break;
-			case 6:
-				board[5] = 'O';
-				break;
-			case 7:
-				board[6] = 'O';
-				break;
-			case 8:
-				board[7] = 'O';
-				break;
-			case 9:
-				board[8] = 'O';
-				break;
-			}
-			cout << "\n";
-			display_gameboard(board);
-			turn += 1;
-			if ((one == 'O' && two == 'O' && three == 'O') || (four == 'O' && five == 'O' && six == 'O') || (seven == 'O' && eight == 'O' && nine == 'O') ||
-				(one == 'O' && four == 'O' && seven == 'O') || (two == 'O' && five == 'O' && eight == 'O') || (three == 'O' && six == 'O' && nine == 'O') ||
-				(one == 'O' && five == 'O' && nine == 'O') || (three == 'O' && five == 'O' && seven == 'O')) {
-				win = 1;
-			}
-			if (!win) {
-				continue;
-			}
-			else {
-				break;
-			}
-		}
-		else {
-			cout << "How even?!";
-		}
+		reset_game();
 	}
 	return 0;
 }
@@ -134,12 +53,94 @@ void intro_text() {
 		<< "4  |  5  |  6\n"
 		<< "1  |  2  |  3\n"
 		<< "\nThree X's or O's wins!\n"
-		<< "Let's Begin!\n\n";
+		<< "Let's Begin!\n";
 }
 
-void display_gameboard(vector<char> boardish) {
-	vector<char> board = boardish;
-	cout << board[6] << "  |  " << board[7] << "  |  " << board[8] << '\n'
-		<< board[3]	<< "  |  " << board[4] << "  |  " << board[5] << '\n'
+void reset_board() {
+	board.clear();
+	for (int i = 0; i <= 8; i++) {
+		board.push_back('-');
+	}
+}
+
+void display_gameboard() {
+	cout << '\n' << board[6] << "  |  " << board[7] << "  |  " << board[8] << '\n'
+		<< board[3] << "  |  " << board[4] << "  |  " << board[5] << '\n'
 		<< board[0] << "  |  " << board[1] << "  |  " << board[2] << "\n\n";
+}
+
+void validate_choice() {
+	while (true) {
+		// validate data type
+		while (true) {
+			cout << player << ", it is your turn! Choose a place (1-9): ";
+			if (cin >> move_choice) {
+				break;
+			}
+			else {
+				cout << "\nPlease enter a position 1-9!\n\n";
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			}
+		}
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+		// validate legal move
+		if (move_choice < 1 || move_choice > 9) {
+			cout << "\nPlease choose a possible section of the board!\n\n";
+			continue;
+		}
+		else if (board[move_choice - 1] != '-') {
+			cout << "\nSelect an unoccupied section of the board!\n\n";
+			continue;
+		}
+		else {
+			break;
+		}
+	}
+}
+
+void evaluate_tie() {
+	int tie_check = 0;
+	for (int i = 0; i <= 8; i++) {
+		if (board[i] != '-') {
+			tie_check++;
+		}
+	}
+	if (tie_check == 9) {
+		tie = 1;
+	}
+	else {
+		tie_check = 0;
+	}
+}
+
+void evaluate_win() {
+	if ((board[0] == player && board[1] == player && board[2] == player) || (board[3] == player && board[4] == player && board[5] == player) || (board[6] == player && board[7] == player && board[8] == player) ||
+		(board[0] == player && board[3] == player && board[6] == player) || (board[1] == player && board[4] == player && board[7] == player) || (board[2] == player && board[5] == player && board[8] == player) ||
+		(board[0] == player && board[4] == player && board[8] == player) || (board[2] == player && board[4] == player && board[6] == player)) {
+		win = 1;
+		champ = player;
+		(champ == 'X') ? x_wins++ : o_wins++;
+	}
+}
+
+void reset_game() {
+	// explain game reset
+	if (win == 1) {
+		cout << champ << " is victorious!\n";
+	}
+	else if (tie == 1) {
+		cout << "There are no more possible moves! Tie game :/\n";
+	}
+
+	cout << "SCORE -> X: " << x_wins << "   O: " << o_wins;
+	turn = 0;
+	tie = 0;
+	win = 0;
+	cout << "\nPlay another game? (y/n): ";
+	cin >> continue_choice;
+	cin.clear();
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
