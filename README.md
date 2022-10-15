@@ -1,3 +1,3 @@
 # tictactoe
 
-we makin a project and shiet
+the actual best game of console-ran tictactoe like ever
